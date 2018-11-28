@@ -94,6 +94,17 @@ function renderCircles(circlesGroup, newXScale, chosenXAxis, newYScale, chosenYA
     return circlesGroup;
 }
 
+//function used for updating text group with transition to new circles
+function renderText(textGroup, newXScale, chosenXAxis, newYScale, chosenYAxis){
+
+  textGroup.transition()
+  .duration(1000)
+  .attr("x", d => newXScale(d[chosenXAxis]))
+  .attr("y", d=> newYScale(d[chosenYAxis]));
+
+  return textGroup;
+}
+
 // function used for updating circles group with new tooltip (Don't need yet)
 function updateToolTip(chosenXAxis, chosenYAxis, circlesGroup) {
     if (chosenXAxis === "age") {
@@ -177,10 +188,20 @@ let circlesGroup = chartGroup.selectAll("circle")
 .append("circle")
 .attr("cx", d => xLinearScale(d[chosenXAxis]))
 .attr("cy", d => yLinearScale(d[chosenYAxis]))
-.attr("r", "10")
+.attr("r", "15")
 .classed("stateCircle", true)
 .attr("stroke-width", "1")
 .attr("stroke", "black");
+
+textGroup = chartGroup.append("text")
+.selectAll("tspan")
+.data(healthData)
+.enter()
+.append("tspan")
+.attr("x", d => xLinearScale(d[chosenXAxis]))
+.attr("y", d => yLinearScale(d[chosenYAxis]))
+.text(d => d.abbr)
+.attr("class", "stateText");
 
 const labelsGroupX = chartGroup.append("g")
 .attr("transform", `translate(${width / 2}, ${height + 20})`);
@@ -268,6 +289,9 @@ labelsGroupX.selectAll("text")
         // updates tooltips with new info
         circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
+        //update text with new X axes
+        textGroup = renderText(textGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis)
+
         // changes classes to change bold text
         if (chosenXAxis === "poverty") {
           povertyLabel
@@ -327,6 +351,9 @@ labelsGroupY.selectAll("text")
         // updates tooltips with new info
         circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
+        //update text with new Y axes
+        textGroup = renderText(textGroup, xLinearScale, chosenXAxis, yLinearScale, chosenYAxis)
+
         // changes classes to change bold text
         if (chosenYAxis === "healthcare") {
           healthLabel
@@ -366,5 +393,3 @@ labelsGroupY.selectAll("text")
 
 
 });
-
-
